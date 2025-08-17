@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="780.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.clickergamejavafx.MainViewController">
+   <children>
+      <Button fx:id="btnClick" layoutX="325.0" layoutY="473.0" mnemonicParsing="false" onMouseClicked="#handleClick" prefHeight="73.0" prefWidth="201.0" text="Click me">
+         <font>
+            <Font name="System Bold Italic" size="37.0" />
+         </font></Button>
+      <Button layoutX="361.0" layoutY="554.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="130.0" text="AutoClicker" visible="false" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="67.0" layoutX="14.0" layoutY="14.0" stroke="WHITE" strokeType="INSIDE" width="179.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="67.0" layoutX="201.0" layoutY="14.0" stroke="WHITE" strokeType="INSIDE" width="201.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="67.0" layoutX="201.0" layoutY="83.0" stroke="WHITE" strokeType="INSIDE" width="201.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="67.0" layoutX="201.0" layoutY="152.0" stroke="WHITE" strokeType="INSIDE" width="201.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="67.0" layoutX="402.0" layoutY="14.0" stroke="WHITE" strokeType="INSIDE" width="179.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="154.0" layoutX="273.0" layoutY="294.0" stroke="WHITE" strokeType="INSIDE" width="305.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="106.0" layoutX="657.0" layoutY="14.0" stroke="WHITE" strokeType="INSIDE" width="179.0" />
+      <Label fx:id="lblPriceClickPowerUpgrade" alignment="CENTER" layoutX="665.0" layoutY="19.0" prefHeight="37.0" prefWidth="163.0" text="Preço" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Button fx:id="btnClickPowerUpgrade" layoutX="665.0" layoutY="56.0" mnemonicParsing="false" onAction="#shop" prefHeight="54.0" prefWidth="163.0" text="Click Power ++">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="106.0" layoutX="657.0" layoutY="126.0" stroke="WHITE" strokeType="INSIDE" width="179.0" />
+      <Label fx:id="lblPriceAutoClickerPowerUpgrade" alignment="CENTER" layoutX="665.0" layoutY="131.0" prefHeight="37.0" prefWidth="163.0" text="Preço" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Button layoutX="665.0" layoutY="168.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="163.0" text="Auto Power ++">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="106.0" layoutX="657.0" layoutY="241.0" stroke="WHITE" strokeType="INSIDE" width="179.0" />
+      <Label fx:id="lblPriceSpeedAutoClickerUpgrade" alignment="CENTER" layoutX="665.0" layoutY="246.0" prefHeight="37.0" prefWidth="163.0" text="Preço" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Button layoutX="665.0" layoutY="283.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="163.0" text="Auto Speed ++">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="106.0" layoutX="657.0" layoutY="354.0" stroke="WHITE" strokeType="INSIDE" width="179.0" />
+      <Label fx:id="lblPriceAutoClicker" alignment="CENTER" layoutX="665.0" layoutY="359.0" prefHeight="37.0" prefWidth="163.0" text="Preço" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Button layoutX="665.0" layoutY="396.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="163.0" text="Buy AutoClicker">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="106.0" layoutX="657.0" layoutY="467.0" stroke="WHITE" strokeType="INSIDE" width="179.0" />
+      <Label fx:id="lblPriceRebirthUpgrade" alignment="CENTER" layoutX="665.0" layoutY="472.0" prefHeight="37.0" prefWidth="163.0" text="Preço" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Button layoutX="665.0" layoutY="509.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="163.0" text="Rebirth">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <Label fx:id="lblMoney" alignment="CENTER" layoutX="22.0" layoutY="29.0" prefHeight="37.0" prefWidth="163.0" text="Money" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblClickPower" alignment="CENTER" layoutX="216.0" layoutY="53.0" prefHeight="27.0" prefWidth="172.0" text="Value" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblAutoClickerPower" alignment="CENTER" layoutX="220.0" layoutY="118.0" prefHeight="12.0" prefWidth="163.0" text="Value" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblSpeedAutoClicker" alignment="CENTER" layoutX="221.0" layoutY="186.0" prefHeight="15.0" prefWidth="163.0" text="Value" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblRebirth" alignment="CENTER" layoutX="410.0" layoutY="29.0" prefHeight="37.0" prefWidth="163.0" text="Rebirths" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblScore" alignment="CENTER" layoutX="294.0" layoutY="318.0" prefHeight="106.0" prefWidth="264.0" text="Score" textFill="WHITE">
+         <font>
+            <Font name="System Italic" size="32.0" />
+         </font>
+      </Label>
+      <AnchorPane layoutX="-113.0" layoutY="491.0" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="320.0" />
+      <Label alignment="CENTER" layoutX="221.0" layoutY="19.0" prefHeight="37.0" prefWidth="163.0" text="Click Power" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" layoutX="225.0" layoutY="83.0" prefHeight="37.0" prefWidth="163.0" text="Auto Clicker Power" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" layoutX="225.0" layoutY="150.0" prefHeight="37.0" prefWidth="163.0" text="Auto Clicker Speed" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+   </children>
+</Pane>
