@@ -11,7 +11,6 @@
          <font>
             <Font name="System Bold Italic" size="37.0" />
          </font></Button>
-      <Button layoutX="361.0" layoutY="554.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="130.0" text="AutoClicker" visible="false" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="67.0" layoutX="14.0" layoutY="14.0" stroke="WHITE" strokeType="INSIDE" width="179.0" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="67.0" layoutX="201.0" layoutY="14.0" stroke="WHITE" strokeType="INSIDE" width="201.0" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#00000038" height="67.0" layoutX="201.0" layoutY="83.0" stroke="WHITE" strokeType="INSIDE" width="201.0" />
@@ -35,7 +34,7 @@
             <Font name="System Bold Italic" size="18.0" />
          </font>
       </Label>
-      <Button layoutX="665.0" layoutY="168.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="163.0" text="Auto Power ++">
+      <Button fx:id="btnAutoClickerPowerUpgrade" layoutX="665.0" layoutY="168.0" mnemonicParsing="false" onAction="#shop" prefHeight="54.0" prefWidth="163.0" text="Auto Power ++">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -46,7 +45,7 @@
             <Font name="System Bold Italic" size="18.0" />
          </font>
       </Label>
-      <Button layoutX="665.0" layoutY="283.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="163.0" text="Auto Speed ++">
+      <Button fx:id="btnSpeedAutoClickerUpgrade" layoutX="665.0" layoutY="283.0" mnemonicParsing="false" onAction="#shop" prefHeight="54.0" prefWidth="163.0" text="Auto Speed ++">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -57,7 +56,7 @@
             <Font name="System Bold Italic" size="18.0" />
          </font>
       </Label>
-      <Button layoutX="665.0" layoutY="396.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="163.0" text="Buy AutoClicker">
+      <Button fx:id="btnBuyAutoClicker" layoutX="665.0" layoutY="396.0" mnemonicParsing="false" onAction="#shop" prefHeight="54.0" prefWidth="163.0" text="Buy AutoClicker">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -68,12 +67,12 @@
             <Font name="System Bold Italic" size="18.0" />
          </font>
       </Label>
-      <Button layoutX="665.0" layoutY="509.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="163.0" text="Rebirth">
+      <Button fx:id="btnRebirthUpgrade" layoutX="665.0" layoutY="509.0" mnemonicParsing="false" onAction="#shop" prefHeight="54.0" prefWidth="163.0" text="Rebirth">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Button>
-      <Label fx:id="lblMoney" alignment="CENTER" layoutX="22.0" layoutY="29.0" prefHeight="37.0" prefWidth="163.0" text="Money" textFill="WHITE">
+      <Label fx:id="lblMoney" alignment="CENTER" layoutX="22.0" layoutY="48.0" prefHeight="37.0" prefWidth="163.0" text="Value" textFill="WHITE">
          <font>
             <Font name="System Bold Italic" size="18.0" />
          </font>
@@ -93,7 +92,7 @@
             <Font name="System Bold Italic" size="18.0" />
          </font>
       </Label>
-      <Label fx:id="lblRebirth" alignment="CENTER" layoutX="410.0" layoutY="29.0" prefHeight="37.0" prefWidth="163.0" text="Rebirths" textFill="WHITE">
+      <Label fx:id="lblRebirth" alignment="CENTER" layoutX="410.0" layoutY="48.0" prefHeight="37.0" prefWidth="163.0" text="Value" textFill="WHITE">
          <font>
             <Font name="System Bold Italic" size="18.0" />
          </font>
@@ -119,5 +118,16 @@
             <Font name="System Bold Italic" size="18.0" />
          </font>
       </Label>
+      <Label alignment="CENTER" layoutX="410.0" layoutY="19.0" prefHeight="37.0" prefWidth="163.0" text="Rebirths" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" layoutX="22.0" layoutY="19.0" prefHeight="37.0" prefWidth="163.0" text="Money" textFill="WHITE">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <ToggleButton fx:id="btnAutoClicker" layoutX="358.0" layoutY="555.0" mnemonicParsing="false" onAction="#handleAutoClicker" prefHeight="37.0" prefWidth="136.0" text="ATIVAR" visible="false" />
    </children>
 </Pane>
