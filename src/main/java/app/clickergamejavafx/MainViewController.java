@@ -16,6 +16,29 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MainViewController{
+
+    private float amountRebirth = 1.0f;
+    private float clickPowerPurchaseMultiplier = 1.08f;
+
+    private float accumulateClickPower = 50.0f;
+    private float accumulateAutoClickPower = 74.0f;
+    private float accumulateSpeedAutoClicker = 56.0f;
+    private float accumulateRebirth = 2240.0f;
+    private float accumulateAutoClicker = 11200.0f;
+
+    //Variaveis de classe dos HashMappings - Atributos
+    private FloatProperty atrClickPower = new SimpleFloatProperty(1.0f);
+    private FloatProperty atrAutoClickerPower = new SimpleFloatProperty(1.0f);
+    private FloatProperty atrSpeedAutoClicker = new SimpleFloatProperty(1.0f);
+    private FloatProperty atrRebirth = new SimpleFloatProperty(0.0f);
+    //Variaveis de classe dos HashMappings - ShoppingList > Upgrades
+    private FloatProperty clickPower = new SimpleFloatProperty(accumulateClickPower);
+    private FloatProperty autoClickerPower = new SimpleFloatProperty(accumulateAutoClickPower);
+    private FloatProperty speedAutoClicker = new SimpleFloatProperty(accumulateSpeedAutoClicker);
+    private FloatProperty rebirth = new SimpleFloatProperty(accumulateRebirth);
+    private FloatProperty autoClicker = new SimpleFloatProperty(accumulateAutoClicker);
+
+    //Timeline
     private Timeline timeline;
     private int score = 0;
     private FloatProperty money = new SimpleFloatProperty(0.0f);
@@ -53,13 +76,16 @@ public class MainViewController{
 
     @FXML
     public void initialize(){
+        //Botão Speed Disable
+        btnSpeedAutoClickerUpgrade.setDisable(true);
+
         //Money separado CASO FUTURAMENTE TENHA OUTRAS MOEDAS, ADICIONAR O MONEY EM UM HASHMAP TAMBÉM
         lblMoney.textProperty().bind(money.asString("%.2f"));
 
-        atributes.put("btnClickPowerUpgrade", new SimpleFloatProperty(1.0f));
-        atributes.put("btnAutoClickerPowerUpgrade", new SimpleFloatProperty(1.0f));
-        atributes.put("btnSpeedAutoClickerUpgrade", new SimpleFloatProperty(1.0f));
-        atributes.put("btnRebirthUpgrade", new SimpleFloatProperty(0.0f));
+        atributes.put("btnClickPowerUpgrade",atrClickPower);
+        atributes.put("btnAutoClickerPowerUpgrade", atrAutoClickerPower);
+        atributes.put("btnSpeedAutoClickerUpgrade", atrSpeedAutoClicker);
+        atributes.put("btnRebirthUpgrade", atrRebirth);
 
         Map<String, Label> atributesLabels = new HashMap<>();
         atributesLabels.put("btnClickPowerUpgrade",lblClickPower);
@@ -78,11 +104,11 @@ public class MainViewController{
         });
 
         //Inicializar o HashMap
-        shoppingList.put("btnClickPowerUpgrade", new SimpleFloatProperty(50.0f));
-        shoppingList.put("btnAutoClickerPowerUpgrade", new SimpleFloatProperty(74.0f));
-        shoppingList.put("btnSpeedAutoClickerUpgrade", new SimpleFloatProperty(50.0f));
-        shoppingList.put("btnBuyAutoClicker", new SimpleFloatProperty(11200.0f));
-        shoppingList.put("btnRebirthUpgrade", new SimpleFloatProperty(1000.0f));
+        shoppingList.put("btnClickPowerUpgrade", clickPower);
+        shoppingList.put("btnAutoClickerPowerUpgrade", autoClickerPower);
+        shoppingList.put("btnSpeedAutoClickerUpgrade", speedAutoClicker);
+        shoppingList.put("btnBuyAutoClicker", autoClicker);
+        shoppingList.put("btnRebirthUpgrade", rebirth);
 
         //Mapeia os preços
         Map<String, Label> priceLabels = new HashMap<>();
@@ -148,17 +174,17 @@ public class MainViewController{
                         //Impede que passe de 0.1f
                         if(atrs.getValue().get() >= 25.0f){return false;}
                         money.set(money.get() - item.getValue().get());
-                        item.getValue().set(item.getValue().get() * 1.12f);
+                        item.getValue().set(item.getValue().get() * 1.10f);
                         atrs.getValue().set(atrs.getValue().get() + 0.05f);
                         //Atualize o RATE DA TIMELINE--Como não achei formas SIMPLES DE FAZER o TEMPO
                         //do keyframe ser atualizado, decidi fazer assim, uma pequena mudança
-                        timeline.setRate(atrs.getValue().getValue());
+                        timeline.setRate(atrSpeedAutoClicker.get());
                         System.out.println("Speed Alterado com sucesso!");
                         return true;
                     }
                     if(item.getKey().equals("btnRebirthUpgrade")){
                         money.set(money.get() - item.getValue().get());
-                        item.getValue().set(item.getValue().get() * 1.12f);
+                        item.getValue().set(item.getValue().get() * 1.10f);
                         atrs.getValue().set(atrs.getValue().get()+1.0f);
                         System.out.println("Rebirth Comprado Com Sucesso!");
                         return true;
@@ -166,8 +192,8 @@ public class MainViewController{
                     //Acima são os botões que usam os atributos mas tem peculiaridades
                     //Abaixo os botões genéricos onde só sobem o value, isso ja bata pra eles.
                     money.set(money.get() - item.getValue().get());
-                    item.getValue().set(item.getValue().get() * 1.12f);
-                    atrs.getValue().set(atrs.getValue().get()+0.12f);
+                    item.getValue().set(item.getValue().get() * 1.10f);
+                    atrs.getValue().set(atrs.getValue().get() * clickPowerPurchaseMultiplier);
                     System.out.println("Atributo Modificado com sucesso!");
                 }
                 //Abaixo Botões que não dependem de atributos mas estão dentro do HashMap do Shop
@@ -193,7 +219,6 @@ public class MainViewController{
     }
 
     public void handleAutoClicker(){
-
         FloatProperty speed = atributes.get("btnSpeedAutoClickerUpgrade");
         FloatProperty autoClickPower = atributes.get("btnAutoClickerPowerUpgrade");
 
@@ -201,7 +226,7 @@ public class MainViewController{
             System.out.println("AutoClicker Ativado");
             btnAutoClicker.setText("DESATIVAR");
             //TIMER------------------------------------------------------------------------------------
-            KeyFrame keyFrame = new KeyFrame(Duration.seconds(speed.getValue()), event -> {
+            KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), event -> {
                 money.set(money.getValue() + autoClickPower.floatValue());
                 score += 1;
                 lblScore.setText("Clicks: " + score);
@@ -215,18 +240,51 @@ public class MainViewController{
 
                 timeline.setCycleCount(Timeline.INDEFINITE);
             }
-
+            btnSpeedAutoClickerUpgrade.setDisable(false);
             timeline.play();
-            //FIM-TIMER-------------------------------------------------------------------------------------------
 
+            //FIM-TIMER-------------------------------------------------------------------------------------------
         }else{
             if(timeline != null){
                 System.out.println("ATIVAR");
                 btnAutoClicker.setText("ATIVAR");
+                btnSpeedAutoClickerUpgrade.setDisable(true);
                 timeline.stop();
             }
         }
+    }
 
+    public void handleRebirth(){
+        if(!(money.get() >= rebirth.get())){
+            System.out.println("Sem dinheiro suficiente, FALTAM: " + (rebirth.get() - money.get()));
+            return;
+        }
+        money.set(0.0f);
+        atrRebirth.set(atrRebirth.get() + amountRebirth);
+        //RESET atributos
+        atrClickPower.set(1.0f);
+        atrAutoClickerPower.set(1.0f);
+        atrSpeedAutoClicker.set(1.0f);
+        //Incremento Preço Permanente
+        accumulateClickPower *= 1.05f;
+        clickPower.set(accumulateClickPower);
+
+        accumulateSpeedAutoClicker *= 1.05f;
+        speedAutoClicker.set(accumulateSpeedAutoClicker);
+
+        accumulateRebirth *= 1.05f;
+        rebirth.set(accumulateRebirth);
+
+        accumulateAutoClickPower *= 1.05f;
+        autoClickerPower.set(accumulateAutoClickPower);
+
+        accumulateAutoClicker *= 1.05f;
+        autoClicker.set(accumulateAutoClicker);
+
+        btnBuyAutoClicker.setDisable(false);
+        btnAutoClicker.setVisible(false);
+        System.out.println("POWER ATUAL: " + clickPowerPurchaseMultiplier);
 
     }
+
 }

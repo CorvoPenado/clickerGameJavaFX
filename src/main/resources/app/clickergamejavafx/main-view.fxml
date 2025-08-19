@@ -67,7 +67,7 @@
             <Font name="System Bold Italic" size="18.0" />
          </font>
       </Label>
-      <Button fx:id="btnRebirthUpgrade" layoutX="665.0" layoutY="509.0" mnemonicParsing="false" onAction="#shop" prefHeight="54.0" prefWidth="163.0" text="Rebirth">
+      <Button fx:id="btnRebirthUpgrade" layoutX="665.0" layoutY="509.0" mnemonicParsing="false" onAction="#handleRebirth" prefHeight="54.0" prefWidth="163.0" text="Rebirth">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
