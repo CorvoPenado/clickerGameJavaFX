@@ -2,7 +2,7 @@
 
 Um jogo clicker simples, onde você clica para ganhar pontos, compra upgrades e realiza renascimentos.
 
-![Gameplay](assets/2025-08-21 18-51-48.gif)
+![Gameplay](assets/gameplay.gif)
 
 🚀 Como rodar o projeto
 Clone este repositório.
