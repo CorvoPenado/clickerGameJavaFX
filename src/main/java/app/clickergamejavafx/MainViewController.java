@@ -26,6 +26,11 @@ public class MainViewController{
     private float accumulateRebirth = 2240.0f;
     private float accumulateAutoClicker = 11200.0f;
 
+    //Variaveis dos botões
+    private boolean stateAutoClickerPuchased = false;
+    private boolean stateAutoClickerVisible =  true;
+    private boolean stateAutoClickerActive = false;
+
     //Variaveis de classe dos HashMappings - Atributos
     private FloatProperty atrClickPower = new SimpleFloatProperty(1.0f);
     private FloatProperty atrAutoClickerPower = new SimpleFloatProperty(1.0f);
@@ -41,7 +46,7 @@ public class MainViewController{
     //Timeline
     private Timeline timeline;
     private int score = 0;
-    private FloatProperty money = new SimpleFloatProperty(0.0f);
+    private FloatProperty money = new SimpleFloatProperty(50000.0f);
     //HashMap pra armazenar a lista de upgrades e seus preços
     private final HashMap<String,FloatProperty> shoppingList = new HashMap<>();
     //HashMap pra armazenar os atributos
@@ -73,6 +78,8 @@ public class MainViewController{
     //--------------------------
     @FXML private Button btnClick;
     @FXML private ToggleButton btnAutoClicker;
+
+
 
     @FXML
     public void initialize(){
@@ -219,11 +226,11 @@ public class MainViewController{
     }
 
     public void handleAutoClicker(){
-        FloatProperty speed = atributes.get("btnSpeedAutoClickerUpgrade");
         FloatProperty autoClickPower = atributes.get("btnAutoClickerPowerUpgrade");
 
         if(btnAutoClicker.isSelected()){
             System.out.println("AutoClicker Ativado");
+            btnSpeedAutoClickerUpgrade.setDisable(false);
             btnAutoClicker.setText("DESATIVAR");
             //TIMER------------------------------------------------------------------------------------
             KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), event -> {
@@ -237,18 +244,18 @@ public class MainViewController{
             if (timeline == null){
                 timeline = new Timeline(keyFrame);
                 // O valor Timeline.INDEFINITE faz ele se repetir infinito. qualquer coisa só alterar pra um numero
-
                 timeline.setCycleCount(Timeline.INDEFINITE);
+
             }
             btnSpeedAutoClickerUpgrade.setDisable(false);
             timeline.play();
 
             //FIM-TIMER-------------------------------------------------------------------------------------------
         }else{
+            System.out.println("AutoClicker Desativado");
             if(timeline != null){
-                System.out.println("ATIVAR");
-                btnAutoClicker.setText("ATIVAR");
                 btnSpeedAutoClickerUpgrade.setDisable(true);
+                btnAutoClicker.setText("ATIVAR");
                 timeline.stop();
             }
         }
@@ -259,6 +266,9 @@ public class MainViewController{
             System.out.println("Sem dinheiro suficiente, FALTAM: " + (rebirth.get() - money.get()));
             return;
         }
+
+        clickPowerPurchaseMultiplier += 0.005;
+
         money.set(0.0f);
         atrRebirth.set(atrRebirth.get() + amountRebirth);
         //RESET atributos
@@ -281,10 +291,17 @@ public class MainViewController{
         accumulateAutoClicker *= 1.05f;
         autoClicker.set(accumulateAutoClicker);
 
+        //Atualiza os botões conforme necessidade
         btnBuyAutoClicker.setDisable(false);
         btnAutoClicker.setVisible(false);
+        btnSpeedAutoClickerUpgrade.setDisable(true);
+        btnAutoClicker.setSelected(false);
+        btnAutoClicker.setText("ATIVAR");
+
+        timeline.stop();
         System.out.println("POWER ATUAL: " + clickPowerPurchaseMultiplier);
 
     }
+
 
 }
