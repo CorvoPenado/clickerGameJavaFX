@@ -2,7 +2,7 @@
 
 Um jogo clicker simples, onde você clica para ganhar pontos, compra upgrades e realiza renascimentos.
 
-![Gameplay](https://i.imgur.com/s7caSMs.gif)
+![Gameplay](assets/fig-lobo.jpg)
 
 🚀 Como rodar o projeto
 Clone este repositório.
