@@ -46,7 +46,7 @@ public class MainViewController{
     //Timeline
     private Timeline timeline;
     private int score = 0;
-    private FloatProperty money = new SimpleFloatProperty(50000.0f);
+    private FloatProperty money = new SimpleFloatProperty(5000000.0f);
     //HashMap pra armazenar a lista de upgrades e seus preços
     private final HashMap<String,FloatProperty> shoppingList = new HashMap<>();
     //HashMap pra armazenar os atributos
