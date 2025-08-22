@@ -26,9 +26,9 @@ Um jogo clicker simples, onde você clica para ganhar pontos, compra upgrades e 
 
 ## 🔄 Atualizações futuras
 
--**Sistema de Salvamento (Save/Load):** Implementar um sistema para salvar e carregar o progresso do jogo (game state).
--**Sistema de Prestígio:** Em vez de apenas renascimentos (Rebirths), adicionar uma moeda de prestígio que o jogador ganha ao reiniciar, concedendo bônus permanentes.
--**Loja de Prestígio:** Criar uma nova loja onde será possível gastar as moedas de prestígio em melhorias permanentes que aumentam o poder do clique (Click Power) ou outros atributos.
+-   **Sistema de Salvamento (Save/Load):** Implementar um sistema para salvar e carregar o progresso do jogo (game state).
+-   **Sistema de Prestígio:** Em vez de apenas renascimentos (Rebirths), adicionar uma moeda de prestígio que o jogador ganha ao reiniciar, concedendo bônus permanentes.
+-   **Loja de Prestígio:** Criar uma nova loja onde será possível gastar as moedas de prestígio em melhorias permanentes que aumentam o poder do clique (Click Power) ou outros atributos.
 
 ---
 
