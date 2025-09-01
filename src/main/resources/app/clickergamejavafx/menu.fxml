@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.clickergamejavafx.MenuController">
+   <children>
+      <ImageView fitHeight="835.0" fitWidth="835.0" layoutY="-118.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@imgs/click.png" />
+         </image>
+      </ImageView>
+      <Button layoutX="283.0" layoutY="231.0" mnemonicParsing="false" onAction="#handleNewGame" prefHeight="69.0" prefWidth="214.0" text="New Game">
+         <font>
+            <Font size="24.0" />
+         </font></Button>
+      <Button layoutX="283.0" layoutY="330.0" mnemonicParsing="false" onAction="#handleLoadGame" prefHeight="69.0" prefWidth="214.0" text="Carregar">
+         <font>
+            <Font size="24.0" />
+         </font></Button>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffffffde" height="126.0" layoutX="138.0" layoutY="32.0" strokeType="INSIDE" width="525.0">
+         <stroke>
+            <LinearGradient endX="1.0" endY="1.0">
+               <stops>
+                  <Stop>
+                     <color>
+                        <Color />
+                     </color>
+                  </Stop>
+                  <Stop offset="1.0">
+                     <color>
+                        <Color red="1.0" green="1.0" blue="1.0" />
+                     </color>
+                  </Stop>
+               </stops>
+            </LinearGradient>
+         </stroke></Rectangle>
+      <Label layoutX="137.0" layoutY="35.0" prefHeight="120.0" prefWidth="525.0" text="Bem Vindo Ao Clicker Game FX">
+         <font>
+            <Font name="Comic Sans MS" size="36.0" />
+         </font></Label>
+   </children>
+</Pane>

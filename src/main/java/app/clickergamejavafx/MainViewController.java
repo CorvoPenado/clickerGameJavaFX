@@ -11,113 +11,377 @@ import javafx.beans.property.SimpleFloatProperty;
 import javafx.scene.control.ToggleButton;
 import javafx.util.Duration;
 
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
-public class MainViewController{
+public class MainViewController {
 
+    // Enum para o estado do jogo. Agora é público para ser acessado pela classe GameStateData.
+    public enum GameState {
+        AUTO_CLICKER_UNPURCHASED,
+        AUTO_CLICKER_PURCHASED_INACTIVE,
+        AUTO_CLICKER_PURCHASED_ACTIVE
+    }
+
+    private GameState currentState;
+    private final String SAVE_FILE_NAME = "save.dat"; // Nome do arquivo de save
+
+    // Game balancing and progression variables
     private float amountRebirth = 1.0f;
     private float clickPowerPurchaseMultiplier = 1.08f;
 
+    // Accumulators for item prices after rebirth
     private float accumulateClickPower = 50.0f;
     private float accumulateAutoClickPower = 74.0f;
     private float accumulateSpeedAutoClicker = 56.0f;
     private float accumulateRebirth = 2240.0f;
     private float accumulateAutoClicker = 11200.0f;
 
-    //Variaveis dos botões
-    private boolean stateAutoClickerPuchased = false;
-    private boolean stateAutoClickerVisible =  true;
-    private boolean stateAutoClickerActive = false;
 
-    //Variaveis de classe dos HashMappings - Atributos
-    private FloatProperty atrClickPower = new SimpleFloatProperty(1.0f);
-    private FloatProperty atrAutoClickerPower = new SimpleFloatProperty(1.0f);
-    private FloatProperty atrSpeedAutoClicker = new SimpleFloatProperty(1.0f);
-    private FloatProperty atrRebirth = new SimpleFloatProperty(0.0f);
-    //Variaveis de classe dos HashMappings - ShoppingList > Upgrades
-    private FloatProperty clickPower = new SimpleFloatProperty(accumulateClickPower);
-    private FloatProperty autoClickerPower = new SimpleFloatProperty(accumulateAutoClickPower);
-    private FloatProperty speedAutoClicker = new SimpleFloatProperty(accumulateSpeedAutoClicker);
-    private FloatProperty rebirth = new SimpleFloatProperty(accumulateRebirth);
-    private FloatProperty autoClicker = new SimpleFloatProperty(accumulateAutoClicker);
+    // --- Player Attributes ---
+    private final FloatProperty atrClickPower = new SimpleFloatProperty(1.0f);
+    private final FloatProperty atrAutoClickerPower = new SimpleFloatProperty(1.0f);
+    private final FloatProperty atrSpeedAutoClicker = new SimpleFloatProperty(1.0f);
+    private final FloatProperty atrRebirth = new SimpleFloatProperty(0.0f);
 
-    //Timeline
+    // --- Shop Item Prices ---
+    private final FloatProperty clickPower = new SimpleFloatProperty(accumulateClickPower);
+    private final FloatProperty autoClickerPower = new SimpleFloatProperty(accumulateAutoClickPower);
+    private final FloatProperty speedAutoClicker = new SimpleFloatProperty(accumulateSpeedAutoClicker);
+    private final FloatProperty rebirth = new SimpleFloatProperty(accumulateRebirth);
+    private final FloatProperty autoClicker = new SimpleFloatProperty(accumulateAutoClicker);
+
+    // Game variables
     private Timeline timeline;
     private int score = 0;
-    private FloatProperty money = new SimpleFloatProperty(5000000.0f);
-    //HashMap pra armazenar a lista de upgrades e seus preços
-    private final HashMap<String,FloatProperty> shoppingList = new HashMap<>();
-    //HashMap pra armazenar os atributos
-    private final HashMap<String,FloatProperty> atributes =  new HashMap<>();
+    private final FloatProperty money = new SimpleFloatProperty(0.0f); // Inicia com 0 para um novo jogo
 
-    //LABELS
+    // Data Structures for managing upgrades and attributes
+    private final HashMap<String, FloatProperty> shoppingList = new HashMap<>();
+    private final HashMap<String, FloatProperty> attributes = new HashMap<>();
+
+    // --- FXML UI Components ---
     @FXML private Label lblMoney;
     @FXML private Label lblClickPower;
     @FXML private Label lblAutoClickerPower;
     @FXML private Label lblSpeedAutoClicker;
     @FXML private Label lblRebirth;
     @FXML private Label lblScore;
-    //Botões-Labels
-    //--------------------------
     @FXML private Button btnClickPowerUpgrade;
     @FXML private Label lblPriceClickPowerUpgrade;
-    //--------------------------
     @FXML private Button btnAutoClickerPowerUpgrade;
     @FXML private Label lblPriceAutoClickerPowerUpgrade;
-    //--------------------------
     @FXML private Button btnSpeedAutoClickerUpgrade;
     @FXML private Label lblPriceSpeedAutoClickerUpgrade;
-    //--------------------------
     @FXML private Button btnBuyAutoClicker;
     @FXML private Label lblPriceAutoClicker;
-    //--------------------------
     @FXML private Button btnRebirthUpgrade;
     @FXML private Label lblPriceRebirthUpgrade;
-    //--------------------------
     @FXML private Button btnClick;
     @FXML private ToggleButton btnAutoClicker;
 
-
-
     @FXML
-    public void initialize(){
-        //Botão Speed Disable
-        btnSpeedAutoClickerUpgrade.setDisable(true);
+    public void initialize() {
+        setupDataMaps();
+        bindLabels();
+        // A lógica de estado inicial agora é controlada pelo initData, que é chamado pelo GameApp.
+    }
 
-        //Money separado CASO FUTURAMENTE TENHA OUTRAS MOEDAS, ADICIONAR O MONEY EM UM HASHMAP TAMBÉM
-        lblMoney.textProperty().bind(money.asString("%.2f"));
+    /**
+     * Ponto de entrada para o controlador após a cena ser carregada.
+     * Decide se inicia um novo jogo ou carrega um existente.
+     * @param shouldLoadGame true para carregar, false para novo jogo.
+     */
+    public void initData(boolean shouldLoadGame) {
+        if (shouldLoadGame) {
+            loadGame();
+        } else {
+            // Configurações para um novo jogo
+            money.set(0.0f);
+            score = 0;
+            lblScore.setText("Clicks: 0");
+            // Define o estado inicial para um novo jogo
+            setState(GameState.AUTO_CLICKER_UNPURCHASED);
+        }
+    }
 
-        atributes.put("btnClickPowerUpgrade",atrClickPower);
-        atributes.put("btnAutoClickerPowerUpgrade", atrAutoClickerPower);
-        atributes.put("btnSpeedAutoClickerUpgrade", atrSpeedAutoClicker);
-        atributes.put("btnRebirthUpgrade", atrRebirth);
+    private void setState(GameState newState) {
+        this.currentState = newState;
+        System.out.println("STATE CHANGED TO: " + newState);
 
-        Map<String, Label> atributesLabels = new HashMap<>();
-        atributesLabels.put("btnClickPowerUpgrade",lblClickPower);
-        atributesLabels.put("btnAutoClickerPowerUpgrade",lblAutoClickerPower);
-        atributesLabels.put("btnSpeedAutoClickerUpgrade",lblSpeedAutoClicker );
-        atributesLabels.put("btnRebirthUpgrade",lblRebirth);
+        switch (currentState) {
+            case AUTO_CLICKER_UNPURCHASED:
+                btnBuyAutoClicker.setDisable(false);
+                btnAutoClicker.setVisible(false);
+                btnSpeedAutoClickerUpgrade.setDisable(true);
+                btnAutoClicker.setSelected(false);
+                btnAutoClicker.setText("ATIVAR");
+                if (timeline != null) {
+                    timeline.stop();
+                }
+                break;
 
-        // Inicialização dos preços padrão das binds
-        atributesLabels.forEach((key, label) -> {
-            FloatProperty priceProperty = atributes.get(key);
-            if (priceProperty != null) {
-                label.textProperty().bind(priceProperty.asString("%.2f"));
-            } else {
-                System.out.println("⚠️ Nenhum atributo encontrado no atributesLabels: " + key);
+            case AUTO_CLICKER_PURCHASED_INACTIVE:
+                btnBuyAutoClicker.setDisable(true);
+                btnAutoClicker.setVisible(true);
+                btnSpeedAutoClickerUpgrade.setDisable(true);
+                btnAutoClicker.setText("ATIVAR");
+                btnAutoClicker.setSelected(false);
+                if (timeline != null) {
+                    timeline.stop();
+                }
+                break;
+
+            case AUTO_CLICKER_PURCHASED_ACTIVE:
+                btnBuyAutoClicker.setDisable(true);
+                btnAutoClicker.setVisible(true);
+                btnSpeedAutoClickerUpgrade.setDisable(false);
+                btnAutoClicker.setText("DESATIVAR");
+                btnAutoClicker.setSelected(true);
+                startTimeline();
+                break;
+        }
+    }
+
+    /**
+     * Salva o estado atual do jogo em um arquivo.
+     */
+    public void saveGame() {
+        GameStateData data = new GameStateData();
+
+        // Coleta todos os dados para o objeto de salvamento
+        data.score = this.score;
+        data.money = this.money.get();
+        data.currentState = this.currentState;
+        data.clickPowerPurchaseMultiplier = this.clickPowerPurchaseMultiplier;
+
+        data.atrClickPower = this.atrClickPower.get();
+        data.atrAutoClickerPower = this.atrAutoClickerPower.get();
+        data.atrSpeedAutoClicker = this.atrSpeedAutoClicker.get();
+        data.atrRebirth = this.atrRebirth.get();
+
+        data.priceClickPower = this.clickPower.get();
+        data.priceAutoClickerPower = this.autoClickerPower.get();
+        data.priceSpeedAutoClicker = this.speedAutoClicker.get();
+        data.priceRebirth = this.rebirth.get();
+        data.priceAutoClicker = this.autoClicker.get();
+
+        data.accumulateClickPower = this.accumulateClickPower;
+        data.accumulateAutoClickPower = this.accumulateAutoClickPower;
+        data.accumulateSpeedAutoClicker = this.accumulateSpeedAutoClicker;
+        data.accumulateRebirth = this.accumulateRebirth;
+        data.accumulateAutoClicker = this.accumulateAutoClicker;
+
+        // Escreve o objeto no arquivo
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(SAVE_FILE_NAME))) {
+            oos.writeObject(data);
+            System.out.println("Jogo salvo com sucesso em " + SAVE_FILE_NAME);
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar o jogo: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Carrega o estado do jogo de um arquivo.
+     */
+    public void loadGame() {
+        File saveFile = new File(SAVE_FILE_NAME);
+        if (!saveFile.exists()) {
+            System.out.println("Nenhum jogo salvo encontrado. Iniciando novo jogo.");
+            initData(false); // Inicia um novo jogo se não houver save
+            return;
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(SAVE_FILE_NAME))) {
+            GameStateData data = (GameStateData) ois.readObject();
+
+            // Restaura todos os dados do objeto para as variáveis do jogo
+            this.score = data.score;
+            this.money.set(data.money);
+            this.clickPowerPurchaseMultiplier = data.clickPowerPurchaseMultiplier;
+
+            this.atrClickPower.set(data.atrClickPower);
+            this.atrAutoClickerPower.set(data.atrAutoClickerPower);
+            this.atrSpeedAutoClicker.set(data.atrSpeedAutoClicker);
+            this.atrRebirth.set(data.atrRebirth);
+
+            this.clickPower.set(data.priceClickPower);
+            this.autoClickerPower.set(data.priceAutoClickerPower);
+            this.speedAutoClicker.set(data.priceSpeedAutoClicker);
+            this.rebirth.set(data.priceRebirth);
+            this.autoClicker.set(data.priceAutoClicker);
+
+            this.accumulateClickPower = data.accumulateClickPower;
+            this.accumulateAutoClickPower = data.accumulateAutoClickPower;
+            this.accumulateSpeedAutoClicker = data.accumulateSpeedAutoClicker;
+            this.accumulateRebirth = data.accumulateRebirth;
+            this.accumulateAutoClicker = data.accumulateAutoClicker;
+
+            lblScore.setText("Clicks: " + this.score);
+
+            // Atualiza a UI para refletir o estado carregado
+            setState(data.currentState);
+
+            System.out.println("Jogo carregado com sucesso!");
+
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Erro ao carregar o jogo: " + e.getMessage());
+            initData(false); // Se o save estiver corrompido, inicia um novo jogo
+        }
+    }
+
+    public void handleClick() {
+        money.set(money.get() + attributes.get("btnClickPowerUpgrade").getValue());
+        score++;
+        lblScore.setText("Clicks: " + score);
+    }
+
+    public boolean shop(ActionEvent event) {
+        Button button = (Button) event.getSource();
+        String upgradeName = button.getId();
+
+        if (upgradeName == null) {
+            System.out.println("Compra falhou ou item não encontrado.");
+            return false;
+        }
+
+        FloatProperty itemPriceProp = shoppingList.get(upgradeName);
+        FloatProperty attributeProp = attributes.get(upgradeName);
+
+        if (itemPriceProp != null && money.get() >= itemPriceProp.get()) {
+            money.set(money.get() - itemPriceProp.get());
+
+            if ("btnBuyAutoClicker".equals(upgradeName)) {
+                System.out.println("Auto Clicker Comprado Com Sucesso!");
+                setState(GameState.AUTO_CLICKER_PURCHASED_INACTIVE);
+                return true;
             }
-        });
 
-        //Inicializar o HashMap
+            if ("btnRebirthUpgrade".equals(upgradeName) && attributeProp != null) {
+                itemPriceProp.set(itemPriceProp.get() * 1.10f);
+                attributeProp.set(attributeProp.get() + 1.0f);
+                System.out.println("Rebirth Comprado Com Sucesso!");
+                return true;
+            }
+
+            if ("btnSpeedAutoClickerUpgrade".equals(upgradeName) && attributeProp != null) {
+                if (attributeProp.get() >= 25.0f) {
+                    money.set(money.get() + itemPriceProp.get());
+                    return false;
+                }
+                itemPriceProp.set(itemPriceProp.get() * 1.10f);
+                attributeProp.set(attributeProp.get() + 0.05f);
+                if (timeline != null) {
+                    timeline.setRate(atrSpeedAutoClicker.get());
+                }
+                System.out.println("Speed Alterado com sucesso!");
+                return true;
+            }
+
+            if (attributeProp != null) {
+                itemPriceProp.set(itemPriceProp.get() * 1.10f);
+                attributeProp.set(attributeProp.get() * clickPowerPurchaseMultiplier);
+                System.out.println("Atributo Modificado com sucesso!");
+                return true;
+            }
+
+            System.out.println("Compra realizada! Novo preço: " + itemPriceProp.get());
+            return true;
+        } else {
+            if (itemPriceProp != null) {
+                float faltam = itemPriceProp.get() - money.getValue();
+                System.out.println("Dinheiro insuficiente! faltam: " + faltam);
+            }
+            return false;
+        }
+    }
+
+
+    public void handleAutoClicker() {
+        if (btnAutoClicker.isSelected() && currentState == GameState.AUTO_CLICKER_PURCHASED_INACTIVE) {
+            setState(GameState.AUTO_CLICKER_PURCHASED_ACTIVE);
+        } else if (!btnAutoClicker.isSelected() && currentState == GameState.AUTO_CLICKER_PURCHASED_ACTIVE) {
+            setState(GameState.AUTO_CLICKER_PURCHASED_INACTIVE);
+        }
+    }
+
+    private void startTimeline() {
+        FloatProperty autoClickPower = attributes.get("btnAutoClickerPowerUpgrade");
+
+        if (timeline == null) {
+            KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), event -> {
+                money.set(money.getValue() + autoClickPower.floatValue());
+                score += 1;
+                lblScore.setText("Clicks: " + score);
+            });
+            timeline = new Timeline(keyFrame);
+            timeline.setCycleCount(Timeline.INDEFINITE);
+        }
+        timeline.setRate(atrSpeedAutoClicker.get());
+        timeline.play();
+    }
+
+
+    public void handleRebirth() {
+        if (money.get() < rebirth.get()) {
+            System.out.println("Sem dinheiro suficiente, FALTAM: " + (rebirth.get() - money.get()));
+            return;
+        }
+
+        clickPowerPurchaseMultiplier += 0.005;
+        money.set(0.0f);
+        atrRebirth.set(atrRebirth.get() + amountRebirth);
+
+        atrClickPower.set(1.0f);
+        atrAutoClickerPower.set(1.0f);
+        atrSpeedAutoClicker.set(1.0f);
+
+        accumulateClickPower *= 1.05f;
+        clickPower.set(accumulateClickPower);
+        accumulateSpeedAutoClicker *= 1.05f;
+        speedAutoClicker.set(accumulateSpeedAutoClicker);
+        accumulateRebirth *= 1.05f;
+        rebirth.set(accumulateRebirth);
+        accumulateAutoClickPower *= 1.05f;
+        autoClickerPower.set(accumulateAutoClickPower);
+        accumulateAutoClicker *= 1.05f;
+        autoClicker.set(accumulateAutoClicker);
+
+        setState(GameState.AUTO_CLICKER_UNPURCHASED);
+
+        System.out.println("REBIRTH COMPLETE! New Power Multiplier: " + clickPowerPurchaseMultiplier);
+    }
+
+    private void setupDataMaps() {
+        attributes.put("btnClickPowerUpgrade", atrClickPower);
+        attributes.put("btnAutoClickerPowerUpgrade", atrAutoClickerPower);
+        attributes.put("btnSpeedAutoClickerUpgrade", atrSpeedAutoClicker);
+        attributes.put("btnRebirthUpgrade", atrRebirth);
+
         shoppingList.put("btnClickPowerUpgrade", clickPower);
         shoppingList.put("btnAutoClickerPowerUpgrade", autoClickerPower);
         shoppingList.put("btnSpeedAutoClickerUpgrade", speedAutoClicker);
         shoppingList.put("btnBuyAutoClicker", autoClicker);
         shoppingList.put("btnRebirthUpgrade", rebirth);
+    }
 
-        //Mapeia os preços
+    private void bindLabels() {
+        lblMoney.textProperty().bind(money.asString("%.2f"));
+
+        Map<String, Label> attributeLabels = new HashMap<>();
+        attributeLabels.put("btnClickPowerUpgrade", lblClickPower);
+        attributeLabels.put("btnAutoClickerPowerUpgrade", lblAutoClickerPower);
+        attributeLabels.put("btnSpeedAutoClickerUpgrade", lblSpeedAutoClicker);
+        attributeLabels.put("btnRebirthUpgrade", lblRebirth);
+
+        attributeLabels.forEach((key, label) -> {
+            FloatProperty priceProperty = attributes.get(key);
+            if (priceProperty != null) {
+                label.textProperty().bind(priceProperty.asString("%.2f"));
+            }
+        });
+
         Map<String, Label> priceLabels = new HashMap<>();
         priceLabels.put("btnClickPowerUpgrade", lblPriceClickPowerUpgrade);
         priceLabels.put("btnAutoClickerPowerUpgrade", lblPriceAutoClickerPowerUpgrade);
@@ -125,183 +389,12 @@ public class MainViewController{
         priceLabels.put("btnBuyAutoClicker", lblPriceAutoClicker);
         priceLabels.put("btnRebirthUpgrade", lblPriceRebirthUpgrade);
 
-        // Inicialização dos preços padrão das binds
         priceLabels.forEach((key, label) -> {
             FloatProperty priceProperty = shoppingList.get(key);
             if (priceProperty != null) {
                 label.textProperty().bind(priceProperty.asString("Price: %.2f"));
-            } else {
-                System.out.println("⚠️ Nenhum preço encontrado no shoppingList para a key: " + key);
             }
         });
-
     }
-
-    public void handleClick(){
-        money.set(money.get() + atributes.get("btnClickPowerUpgrade").getValue());
-        score++;
-        lblMoney.textProperty().bind(money.asString("%.2f"));
-        lblScore.setText("Clicks: "+ score);
-    }
-
-    public boolean shop(ActionEvent event){
-        //Pega o Objeto - Componente que foi interagido
-        //por padrão, JavaFX retorna em String o ID dos componentes setados la no FXML
-        Button button = (Button) event.getSource();
-        String upgradeName = button.getId();
-
-        //verif basica pra ver se achou o id
-        if (upgradeName != null) {
-            //faz uma busca interna e armazena em item, parecido com as malemolencias de String
-            //onde você usa comandos de conversão e tal, e internamente eles ja fazem um LOOP e verificações
-            //Então é só usar, pode relacionar isso também com banco de dados, é como se fosse uma busca
-            //o filter é como se fosse um 'WHERE' e o findFirst, ele pega o PRIMEIRO ID correspondente
-            //caso contrário retorna null.
-            Map.Entry<String, FloatProperty> item = shoppingList.entrySet()
-                    .stream()
-                    .filter(entry -> entry.getKey().equals(upgradeName))
-                    .findFirst()
-                    .orElse(null);
-
-            //Associa a KEY com os atributos
-            //parecido com o de cima só que pros atributos
-            Map.Entry<String, FloatProperty> atrs = atributes.entrySet()
-                    .stream()
-                    .filter(entry -> entry.getKey().equals(upgradeName))
-                    .findFirst()
-                    .orElse(null);
-
-            //verif do money comparado ao upgrade
-            if (item != null && money.get() >= item.getValue().get()) {
-                if(atrs != null){
-                    //Aqui eu tive que fazer especifico pra alguns botões, mas o restante que segue o padrão de
-                    //aumentar seu valor em 1.12* se mantém, alguns botões precisavam de tratamento extra
-                    //porque funcionavam de forma distinta
-                    if(atrs.getKey().equals("btnSpeedAutoClickerUpgrade")){
-                        //Impede que passe de 0.1f
-                        if(atrs.getValue().get() >= 25.0f){return false;}
-                        money.set(money.get() - item.getValue().get());
-                        item.getValue().set(item.getValue().get() * 1.10f);
-                        atrs.getValue().set(atrs.getValue().get() + 0.05f);
-                        //Atualize o RATE DA TIMELINE--Como não achei formas SIMPLES DE FAZER o TEMPO
-                        //do keyframe ser atualizado, decidi fazer assim, uma pequena mudança
-                        timeline.setRate(atrSpeedAutoClicker.get());
-                        System.out.println("Speed Alterado com sucesso!");
-                        return true;
-                    }
-                    if(item.getKey().equals("btnRebirthUpgrade")){
-                        money.set(money.get() - item.getValue().get());
-                        item.getValue().set(item.getValue().get() * 1.10f);
-                        atrs.getValue().set(atrs.getValue().get()+1.0f);
-                        System.out.println("Rebirth Comprado Com Sucesso!");
-                        return true;
-                    }
-                    //Acima são os botões que usam os atributos mas tem peculiaridades
-                    //Abaixo os botões genéricos onde só sobem o value, isso ja bata pra eles.
-                    money.set(money.get() - item.getValue().get());
-                    item.getValue().set(item.getValue().get() * 1.10f);
-                    atrs.getValue().set(atrs.getValue().get() * clickPowerPurchaseMultiplier);
-                    System.out.println("Atributo Modificado com sucesso!");
-                }
-                //Abaixo Botões que não dependem de atributos mas estão dentro do HashMap do Shop
-                //Como o botão de autoclicker, ele não tem atributos, ele só precisa ser comprado uma vez
-                if(item.getKey().equals("btnBuyAutoClicker")){
-                    btnBuyAutoClicker.setDisable(true);
-                    btnAutoClicker.setVisible(true);
-                    money.set(money.get() - item.getValue().get());
-                    System.out.println("Auto Clicker Comprado Com Sucesso!");
-                    return true;
-                }
-                System.out.println("Compra realizada! Novo preço: " + item.getValue().get());
-                return true; // Retorna true indicando sucesso
-            }else{
-                Float faltam = item.getValue().get() - money.getValue();
-                System.out.println("Dinheiro insuficiente! faltam: " + faltam);
-                return false;
-            }
-        }
-        // Se a compra não foi realizada, cai aqui
-        System.out.println("Compra falhou ou item não encontrado.");
-        return false;
-    }
-
-    public void handleAutoClicker(){
-        FloatProperty autoClickPower = atributes.get("btnAutoClickerPowerUpgrade");
-
-        if(btnAutoClicker.isSelected()){
-            System.out.println("AutoClicker Ativado");
-            btnSpeedAutoClickerUpgrade.setDisable(false);
-            btnAutoClicker.setText("DESATIVAR");
-            //TIMER------------------------------------------------------------------------------------
-            KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), event -> {
-                money.set(money.getValue() + autoClickPower.floatValue());
-                score += 1;
-                lblScore.setText("Clicks: " + score);
-            });
-            //Ainda não sei pra que serve a TimeLine, mas sei que temos que colocar o keyFrame no construtor dela
-            //Imagino que TimeLine seja alguma classe que monta uma Thread paralela pra executar as funções
-            //e ela recebe o keyFrame como parametro :)
-            if (timeline == null){
-                timeline = new Timeline(keyFrame);
-                // O valor Timeline.INDEFINITE faz ele se repetir infinito. qualquer coisa só alterar pra um numero
-                timeline.setCycleCount(Timeline.INDEFINITE);
-
-            }
-            btnSpeedAutoClickerUpgrade.setDisable(false);
-            timeline.play();
-
-            //FIM-TIMER-------------------------------------------------------------------------------------------
-        }else{
-            System.out.println("AutoClicker Desativado");
-            if(timeline != null){
-                btnSpeedAutoClickerUpgrade.setDisable(true);
-                btnAutoClicker.setText("ATIVAR");
-                timeline.stop();
-            }
-        }
-    }
-
-    public void handleRebirth(){
-        if(!(money.get() >= rebirth.get())){
-            System.out.println("Sem dinheiro suficiente, FALTAM: " + (rebirth.get() - money.get()));
-            return;
-        }
-
-        clickPowerPurchaseMultiplier += 0.005;
-
-        money.set(0.0f);
-        atrRebirth.set(atrRebirth.get() + amountRebirth);
-        //RESET atributos
-        atrClickPower.set(1.0f);
-        atrAutoClickerPower.set(1.0f);
-        atrSpeedAutoClicker.set(1.0f);
-        //Incremento Preço Permanente
-        accumulateClickPower *= 1.05f;
-        clickPower.set(accumulateClickPower);
-
-        accumulateSpeedAutoClicker *= 1.05f;
-        speedAutoClicker.set(accumulateSpeedAutoClicker);
-
-        accumulateRebirth *= 1.05f;
-        rebirth.set(accumulateRebirth);
-
-        accumulateAutoClickPower *= 1.05f;
-        autoClickerPower.set(accumulateAutoClickPower);
-
-        accumulateAutoClicker *= 1.05f;
-        autoClicker.set(accumulateAutoClicker);
-
-        //Atualiza os botões conforme necessidade
-        btnBuyAutoClicker.setDisable(false);
-        btnAutoClicker.setVisible(false);
-        btnSpeedAutoClickerUpgrade.setDisable(true);
-        btnAutoClicker.setSelected(false);
-        btnAutoClicker.setText("ATIVAR");
-
-        timeline.stop();
-        System.out.println("POWER ATUAL: " + clickPowerPurchaseMultiplier);
-
-    }
-
-
 }
+
